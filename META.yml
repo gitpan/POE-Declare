@@ -18,4 +18,4 @@ requires:
   Params::Util: 0.17
   Scalar::Util: 1.17
   perl: 5.005
-version: 0.01
+version: 0.02
