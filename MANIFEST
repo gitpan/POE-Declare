@@ -6,6 +6,7 @@ inc/Module/Install/Fetch.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
+inc/Module/Install/With.pm
 inc/Module/Install/WriteAll.pm
 lib/POE/Declare.pm
 lib/POE/Declare/Meta.pm
@@ -15,6 +16,7 @@ lib/POE/Declare/Meta/Internal.pm
 lib/POE/Declare/Meta/Message.pm
 lib/POE/Declare/Meta/Param.pm
 lib/POE/Declare/Meta/Slot.pm
+lib/POE/Declare/Meta/Timeout.pm
 lib/POE/Declare/Object.pm
 LICENSE
 Makefile.PL
@@ -23,4 +25,6 @@ META.yml
 README
 t/01_compile.t
 t/03_simple.t
-t/99_pod.t
+t/97_meta.t
+t/98_pod.t
+t/99_pmv.t

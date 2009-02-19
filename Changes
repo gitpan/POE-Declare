@@ -1,4 +1,10 @@
-Revision history for Perl extension POE::Declare
+Revision history for Perl extension POE-Declare
+
+0.03 Fri 20 Feb 2009
+	- Upgrading to Module::Install 0.79
+	- Correcting dependencies
+	- Timeout events are modelled correctly now
+	- No functional changes
 
 0.02 Tue 12 Sep 2006
 	- More thorough testing

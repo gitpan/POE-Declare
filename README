@@ -1,8 +1,27 @@
 NAME
     POE::Declare - A POE abstraction layer for conciseness and simplicity
 
+SYNOPSIS
+      package MyComponent;
+  
+      use strict;
+      use POE::Declare;
+  
+      declare foo => 'Atribute';
+      declare bar => 'Internal';
+  
+      sub hello : Event {
+          print "Hello World!\n";
+      }
+  
+      sub hello_timeout : Alarm {
+          print "Alas, I die!\n";
+      }
+  
+      1;
+
 DESCRIPTION
-    WARNING: THIS CODE IS HIGHLY EXPERIMENTAL AND MADE BE CHANGED OR DELETED
+    WARNING: THIS CODE IS EXPERIMENTAL AND MADE BE CHANGED OR DELETED
     ENTIRELY WITHOUT NOTICE
 
     POE is a very powerful and flexible system for doing asynchronous
@@ -12,7 +31,8 @@ DESCRIPTION
 
     In particular, I have found it hard to resolve POE's way of programming
     with the highly abstracted OO that I am used to, with layer stacked upon
-    layer ad-infinitum.
+    layer ad-infinitum to create powerful and complex systems that are still
+    easy to maintain.
 
     I have found this particularly noticable as the scale of a codebase gets
     later. At three levels of abstraction the layering become quite
@@ -48,13 +68,13 @@ SUPPORT
     author.
 
 AUTHORS
-    Adam Kennedy <adamk@cpan.org<
+    Adam Kennedy <adamk@cpan.org>
 
 SEE ALSO
     POE, <http://ali.as/>
 
 COPYRIGHT
-    Copyright 2006 Adam Kennedy.
+    Copyright 2006 - 2009 Adam Kennedy.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

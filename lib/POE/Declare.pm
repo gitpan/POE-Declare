@@ -6,9 +6,29 @@ package POE::Declare;
 
 POE::Declare - A POE abstraction layer for conciseness and simplicity
 
+=head1 SYNOPSIS
+
+  package MyComponent;
+  
+  use strict;
+  use POE::Declare;
+  
+  declare foo => 'Atribute';
+  declare bar => 'Internal';
+  
+  sub hello : Event {
+      print "Hello World!\n";
+  }
+  
+  sub hello_timeout : Alarm {
+      print "Alas, I die!\n";
+  }
+  
+  1;
+
 =head1 DESCRIPTION
 
-B<WARNING: THIS CODE IS HIGHLY EXPERIMENTAL AND MADE BE CHANGED
+B<WARNING: THIS CODE IS EXPERIMENTAL AND MADE BE CHANGED
 OR DELETED ENTIRELY WITHOUT NOTICE>
 
 L<POE> is a very powerful and flexible system for doing asynchronous
@@ -18,7 +38,8 @@ But personally, I find it confusing and tricky to use at times.
 
 In particular, I have found it hard to resolve L<POE>'s way of
 programming with the highly abstracted OO that I am used to,
-with layer stacked upon layer ad-infinitum.
+with layer stacked upon layer ad-infinitum to create powerful
+and complex systems that are still easy to maintain.
 
 I have found this particularly noticable as the scale of a
 codebase gets later. At three levels of abstraction the layering
@@ -48,19 +69,19 @@ implementation and comment.
 
 =cut
 
-use 5.005;
+use 5.008007;
 use strict;
-use Carp                 qw{ croak };
-use Exporter             ();
-use List::Util           qw{ first };
-use Params::Util         qw{ _IDENTIFIER _CLASS };
-use Class::Inspector     ();
-use POE                  qw{ Session };
-use POE::Declare::Meta   ();
+use Carp               ();
+use Exporter           ();
+use List::Util         ();
+use Params::Util       qw{ _IDENTIFIER _CLASS };
+use Class::Inspector   ();
+use POE                qw{ Session };
+use POE::Declare::Meta ();
 
 # The base class requires POE::Declare to be fully compiled,
-# so load it in post-BEGIN with a require rather than at BEGIN-time
-# with a use.
+# so load it in post-BEGIN with a require rather than at
+# BEGIN-time with a use.
 require POE::Declare::Object;
 
 # Provide the SELF constant
@@ -68,7 +89,7 @@ use constant SELF => HEAP;
 
 use vars qw{$VERSION @ISA @EXPORT %ATTR %EVENT %META};
 BEGIN {
-	$VERSION = '0.02';
+	$VERSION = '0.03';
 	@ISA     = qw{ Exporter };
 	@EXPORT  = qw{ SELF declare compile };
 
@@ -124,34 +145,33 @@ sub declare (@) {
 sub _declare {
 	my $pkg = shift;
 	if ( $META{$pkg} ) {
-		croak("Too late to declare additions to $pkg");
+		Carp::croak("Too late to declare additions to $pkg");
 	}
 
 	# What is the name of the attribute
 	my $name = shift;
 	unless ( _IDENTIFIER($name) ) {
-		croak("Did not provide a valid attribute name");
+		Carp::croak("Did not provide a valid attribute name");
 	}
 
 	# Has the attribute already been defined
 	if ( $ATTR{$pkg}->{$name} ) {
-		croak("Attribute $name already defined in class $pkg");
+		Carp::croak("Attribute $name already defined in class $pkg");
 	}
 
-	# # Resolve the attribute class
+	# Resolve the attribute class
 	my $type = do {
 		local $Carp::CarpLevel += 1;
 		attribute_class(shift);
-		};
+	};
 
 	# Is the class an attribute class?
 	unless ( $type->isa('POE::Declare::Meta::Slot') ) {
-		croak("The class $type is not a POE::Declare::Slot");
+		Carp::croak("The class $type is not a POE::Declare::Slot");
 	}
 
 	# Create and save the attribute
-	my $attribute = $type->new( name => $name, @_ );
-	$ATTR{$pkg}->{$name} = $attribute;
+	$ATTR{$pkg}->{$name} = $type->new( name => $name, @_ );
 
 	return 1;
 }
@@ -164,7 +184,7 @@ sub attribute_class {
 	} elsif ( _CLASS($type) ) {
 		$type = $type;
 	} else {
-		croak("Invalid attribute type");
+		Carp::croak("Invalid attribute type");
 	}
 
 	# Try to load the attribute class
@@ -175,19 +195,13 @@ sub attribute_class {
 		local $Carp::CarpLevel += 1;
 		my $quotefile = quotemeta $file;
 		if ( $@ =~ /^Can\'t locate $quotefile/ ) {
-			croak("The attribute class $type does not exist");
+			Carp::croak("The attribute class $type does not exist");
 		} else {
-			croak($@);
+			Carp::croak($@);
 		}
 	}
 
 	return $type;
-}
-
-# Declare an event
-sub event {
-	
-	$EVENT{$_[0]}->{$_[1]} = 1;
 }
 
 # Compile a named class
@@ -204,14 +218,16 @@ sub compile {
 	# Make sure any parent POE::Declare classes are compiled
 	foreach my $parent ( @super ) {
 		next if $META{$parent};
-		croak("Cannot compile $pkg, parent class $parent not compiled");
+		Carp::croak("Cannot compile $pkg, parent class $parent not compiled");
 	}
 
 	# Are any attributes already defined in our parents?
 	foreach my $name ( sort keys %{$ATTR{$pkg}} ) {
-		my $found = first { $ATTR{$_}->{attr}->{$name} } @super;
+		my $found = List::Util::first {
+			$ATTR{$_}->{attr}->{$name}
+		} @super;
 		if ( $found ) {
-			croak("Duplicate attribute '$name' already defined in " . $found->name );
+			Carp::croak("Duplicate attribute '$name' already defined in " . $found->name );
 		}
 		$meta->{attr}->{$name} = $ATTR{$pkg}->{$name};
 	}
@@ -227,7 +243,10 @@ sub meta {
 }
 
 sub next_alias {
-	my $meta = $META{$_[0]}	or croak("Cannot instantiate $_[0], class not defined");
+	my $meta = $META{$_[0]};
+	unless ( $meta ) {
+		Carp::croak("Cannot instantiate $_[0], class not defined");
+	}
 	$meta->next_alias;
 }
 
@@ -245,7 +264,7 @@ For other issues, or commercial enhancement or support, contact the author.
 
 =head1 AUTHORS
 
-Adam Kennedy E<lt>adamk@cpan.orgE<lt>
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
@@ -253,7 +272,7 @@ L<POE>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 
-Copyright 2006 Adam Kennedy.
+Copyright 2006 - 2009 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
