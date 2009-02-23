@@ -19,6 +19,7 @@ no_index:
 requires:
   Class::ISA: 0.33
   Class::Inspector: 1.22
+  Class::XSAccessor: 0.14
   IO::File: 1.14
   List::Util: 1.18
   POE: 1.003
@@ -27,4 +28,4 @@ requires:
   perl: 5.8.7
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.03
+version: 0.05
