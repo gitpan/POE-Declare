@@ -4,6 +4,7 @@ author:
   - 'Adam Kennedy <adamk@cpan.org>'
 build_requires:
   Test::More: 0.80
+  Test::POE::Stopping: 0.02
 distribution_type: module
 generated_by: 'Module::Install version 0.79'
 license: perl
@@ -28,4 +29,4 @@ requires:
   perl: 5.8.7
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.11
+version: 0.12
