@@ -95,7 +95,8 @@ ARCHITECTURE
 
   POE::Declare::Meta::Timeout
     POE::Declare::Meta::Timeout is a POE::Declare::Meta::Event sub-class
-    that is designed to trigger from an alarm.
+    that is designed to trigger from an alarm and generates additional
+    methods to manage the alarms.
 
 FUNCTIONS
     For the first few releases, I plan to leave this module undocumented.
