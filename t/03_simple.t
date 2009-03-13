@@ -1,15 +1,17 @@
 #!/usr/bin/perl
 
-# Compile testing for asa
+# Compile testing for POE::Declare
 
 use strict;
 use warnings;
 BEGIN {
 	$|  = 1;
+	# $POE::Declare::Meta::DEBUG = 1;
 }
 
-use Test::More tests => 56;
+use Test::More tests => 59;
 use Test::NoWarnings;
+use Test::Exception;
 
 
 
@@ -75,6 +77,9 @@ SCOPE: {
 	isa_ok( $meta, 'POE::Declare::Meta' );
 	is( $meta->compiled, 1, '->compiled is true' );
 	is( $meta->name, 'Foo', '->name is ok' );
+	my $meta2 = Foo->meta;
+	isa_ok( $meta, 'POE::Declare::Meta' );
+	is_deeply( $meta, $meta2, 'Foo->meta ok' );
 	is( ref($meta->{attr}), 'HASH', '->{attr} is a hash' );
 	isa_ok( $meta->{attr}->{foo},    'POE::Declare::Meta::Attribute' );
 	isa_ok( $meta->{attr}->{bar},    'POE::Declare::Meta::Internal'  );
@@ -86,10 +91,19 @@ SCOPE: {
 	is( $meta->{attr}->{to}->name,     'to',     'Attribute to ->name ok'     );
 
 	# Create an object
-	my $object = Foo->new( foo => 'foo' );
+	my $object = Foo->new( One => 'foo' );
 	isa_ok( $object, 'Foo' );
-	is( $object->foo,   'foo',   '->foo created and returns correctly' );
+	is( $object->One,   'foo',   '->foo created and returns correctly' );
 	is( $object->Alias, 'Foo.1', 'Pregenerated ->Alias returns as expected' );
+
+	# Test errors
+	throws_ok(
+		sub {
+			Foo->new( foo => 'bar' );
+		},
+		qr/Unknown or unsupported Foo param\(s\) foo/,
+		'Threw expected constructor error',
+	);
 
 	# Check the kernel method
 	isa_ok( $object->kernel, 'POE::Kernel' );
@@ -116,16 +130,16 @@ SCOPE: {
 
 	# Check the package_states method
 	is_deeply(
-		[ $meta->package_states ],
+		[ $meta->_package_states ],
 		[ '_alias_remove', '_alias_set', '_start', '_stop', 'findme', 'to' ],
-		'->package_states returns as expected',
+		'->_package_states returns as expected',
 	);
 
 	# Check the params method
 	is_deeply(
-		[ $meta->params ],
+		[ $meta->_params ],
 		[ 'Alias', 'One', 'Two' ],
-		'->params returns as expected',
+		'->_params returns as expected',
 	);
 
 	# Check various spawning related methods

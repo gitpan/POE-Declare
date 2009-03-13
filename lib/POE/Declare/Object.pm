@@ -31,7 +31,7 @@ use POE::Declare ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.14';
+	$VERSION = '0.15';
 }
 
 # Inside-out storage of internal values
@@ -89,9 +89,10 @@ and returns the L<POE::Declare::Meta> metadata object for that class.
 
 =cut
 
-sub meta {
-	POE::Declare::meta( ref $_[0] || $_[0] );
-}
+# Moved to code generation
+# sub meta ($) {
+#     POE::Declare::meta( ref $_[0] || $_[0] );
+# }
 
 
 
@@ -128,21 +129,33 @@ or throw an exception on error.
 
 sub new {
 	my $class = shift;
+	my $self  = bless { }, $class;
 	my %param = @_;
 
-	my $self  = bless { @_ }, $class;
-
-	# Clear out any accidentally set internal values
-	delete $ID{Scalar::Util::refaddr($self)};
-
-	# Set the alias
-	if ( exists $self->{Alias} ) {
-		unless ( Params::Util::_STRING($self->{Alias}) ) {
+	# Check the Alias
+	if ( exists $param{Alias} ) {
+		unless ( Params::Util::_STRING($param{Alias}) ) {
 			Carp::croak("Did not provide a valid Alias param, must be a string");
 		}
+		$self->{Alias} = delete $param{Alias};
 	} else {
 		$self->{Alias} = $self->meta->next_alias;
 	}
+
+	# Check and default params
+	foreach ( $class->meta->_params ) {
+		next unless exists $param{$_};
+		$self->{$_} = delete $param{$_};
+	}
+
+	# Check for unsupported params
+	if ( %param ) {
+		my $names = join ', ', sort keys %param;
+		die("Unknown or unsupported $class param(s) $names");
+	}
+
+	# Clear out any accidentally set internal values
+	delete $ID{Scalar::Util::refaddr($self)};
 
 	$self;
 }
@@ -204,7 +217,7 @@ sub spawn {
 	POE::Session->create(
 		heap           => $self,
 		package_states => [
-			$meta->name => [ $meta->package_states ],
+			$meta->name => [ $meta->_package_states ],
 		],
 	)->ID;
 
