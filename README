@@ -7,8 +7,9 @@ SYNOPSIS
       use strict;
       use POE::Declare;
   
-      declare foo => 'Attribute';
-      declare bar => 'Internal';
+      declare foo          => 'Attribute';
+      declare bar          => 'Internal';
+      declare TimeoutError => 'Message';
   
       sub hello : Event {
           print "Hello World!\n";
@@ -16,6 +17,9 @@ SYNOPSIS
   
       sub hello_timeout : Timeout(30) {
           print "Alas, I die!\n";
+  
+          # Tell our parent as well
+          $_[SELF]->TimeoutError;
       }
   
       1;

@@ -31,7 +31,7 @@ use POE::Declare ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.16';
+	$VERSION = '0.18';
 }
 
 # Inside-out storage of internal values
@@ -129,6 +129,7 @@ or throw an exception on error.
 
 sub new {
 	my $class = shift;
+	my $meta  = $class->meta;
 	my $self  = bless { }, $class;
 	my %param = @_;
 
@@ -139,11 +140,11 @@ sub new {
 		}
 		$self->{Alias} = delete $param{Alias};
 	} else {
-		$self->{Alias} = $self->meta->next_alias;
+		$self->{Alias} = $meta->next_alias;
 	}
 
 	# Check and default params
-	foreach ( $class->meta->_params ) {
+	foreach ( $meta->_params ) {
 		next unless exists $param{$_};
 		$self->{$_} = delete $param{$_};
 	}
@@ -154,10 +155,48 @@ sub new {
 		die("Unknown or unsupported $class param(s) $names");
 	}
 
+	# Check and normalize message registration
+	foreach ( $meta->_messages ) {
+		$self->{$_} = _CALLBACK($self->{$_});
+	}
+
 	# Clear out any accidentally set internal values
 	delete $ID{Scalar::Util::refaddr($self)};
 
 	$self;
+}
+
+# Check the validity of a provided message handler.
+sub _CALLBACK {
+	my $it = $_[1];
+
+	# The callback is an anonymous subroutine
+	return $it if Params::Util::_CODE($it);
+
+	# Otherwise, we also allow a reference to an array,
+	# which contains two identifiers (like foo_bar).
+	# This will be converted to a call to the relevant
+	# POE session.event
+	if (
+		Params::Util::_ARRAY0($it)
+		and
+		scalar(@$it) == 2
+		and
+		Params::Util::_IDENTIFIER($it->[0])
+		and
+		Params::Util::_IDENTIFIER($it->[1])
+	) {
+		# Create a closure for the call
+		my $session = $it->[0];
+		my $event   = $it->[1];
+		my $closure = sub {
+			$poe_kernel->call( $session, $event, @_ );
+		};
+		return $closure;
+	}
+
+	# Otherwise, not valid
+	Carp::croak('Invalid message event handler');
 }
 
 =pod
@@ -276,105 +315,6 @@ L<POE::Kernel> object that objects of this class will run in.
 =cut
 
 use constant kernel => $poe_kernel;
-
-
-
-
-
-#####################################################################
-# Default Events
-
-=pod
-
-=head2 _start
-
-The default C<_start> implementation is used to register the alias for
-the heap object with the kernel. As such, if you need to do your own
-tasks in C<_start> you should always call it first.
-
-  sub _start {
-      my $self = $_[HEAP];
-      $_[0]->SUPER::_start(@_[1..$#_]);
-
-      # Additional tasks here
-      ...
-  }
-
-Please note though that the super call will break @_ in the current
-subroutine, and so you should not use C<$_[KERNEL]> style expressions
-after the SUPER call.
-
-=cut
-
-sub _start : Event {
-	$ID{Scalar::Util::refaddr($_[HEAP])} = $_[SESSION]->ID;
-	$poe_kernel->call( $_[SESSION], '_alias_set');
-}
-
-=pod
-
-=head2 _stop
-
-The default C<_stop> implementation is used to clean up our resources
-and aliases in the kernel. As such, if you need to do your own
-tasks in C<_stop> you should always do them first and then call the
-SUPER last.
-
-  sub _stop {
-      my $self = $_[HEAP];
-
-      # Additional tasks here
-      ...
-
-      shift->SUPER::_stop(@_);
-  }
-
-=cut
-
-sub _stop : Event {
-	delete $ID{Scalar::Util::refaddr($_[HEAP])};
-}
-
-=pod
-
-=head2 _alias_set
-
-During the period in which a L<POE::Declare> object is active, it will
-register an alias with the L<POE> kernel (so that the session will not be
-cleaned up if it has no queued events of it's own and it only waiting for
-other sessions to send it a message).
-
-The C<_alias_set> method (which takes no parameters) will set the alias
-for the current object. This will be done automatically for you during
-the C<spawn> process (in the C<_start> event).
-
-=cut
-
-sub _alias_set : Event {
-	### This will fail is sessions have clashing aliases
-	my $alias = $_[HEAP]->Alias;
-	unless ( defined $poe_kernel->alias_resolve($alias) ) {
-		if ( $poe_kernel->alias_set($alias) ) {
-			# Failed to set alias
-			Carp::croak("Failed to set alias '$alias'");
-		}
-	}
-}
-
-sub _alias_remove : Event {
-	my $self    = $_[HEAP];
-	my $alias   = $self->Alias;
-	my $session = $poe_kernel->alias_resolve($alias);
-	my $poe_id  = $session->ID;
-	my $self_id = $ID{Scalar::Util::refaddr($self)};
-	unless ( defined $poe_id and defined $self_id ) {
-		return;
-	}
-	unless ( $poe_id == $self_id ) {
-		Carp::croak("Session id mismatch error");
-	}
-	$poe_kernel->alias_remove($alias);
-}
 
 
 
@@ -616,64 +556,121 @@ sub delay_adjust {
 
 
 #####################################################################
-# message Support
+# Events
 
-# Dispatch a message, if registered
-sub send_message {
-	my ($self, $name) = @_;
-	return unless $self->{$name};
-	return $self->{$name}->( $self->Alias, @_ );
+=pod
+
+=head1 EVENTS
+
+The following POE events are provided for all classes
+
+=head2 _start
+
+The default C<_start> implementation is used to register the alias for
+the heap object with the kernel. As such, if you need to do your own
+tasks in C<_start> you should always call it first.
+
+  sub _start {
+      my $self = $_[HEAP];
+      $_[0]->SUPER::_start(@_[1..$#_]);
+
+      # Additional tasks here
+      ...
+  }
+
+Please note though that the super call will break @_ in the current
+subroutine, and so you should not use C<$_[KERNEL]> style expressions
+after the SUPER call.
+
+=cut
+
+sub _start : Event {
+	$ID{Scalar::Util::refaddr($_[HEAP])} = $_[SESSION]->ID;
+	$poe_kernel->call( $_[SESSION], '_alias_set');
 }
 
 =pod
 
-=head2 set_message
+=head2 _stop
 
-The C<set_message> method is used to set or change a callback event
-registration after the initial creation of the object.
+The default C<_stop> implementation is used to clean up our resources
+and aliases in the kernel. As such, if you need to do your own
+tasks in C<_stop> you should always do them first and then call the
+SUPER last.
+
+  sub _stop {
+      my $self = $_[HEAP];
+
+      # Additional tasks here
+      ...
+
+      shift->SUPER::_stop(@_);
+  }
 
 =cut
 
-sub set_message {
-	unless ( $_[0]->{__callback}->{$_[1]} ) {
-		Carp::croak("The callback event $_[1] does not exist");
-	}
-	$_[0]->{$_[1]} = _CALLBACK($_[2]);
-	return 1;
+sub _stop : Event {
+	delete $ID{Scalar::Util::refaddr($_[HEAP])};
 }
 
-# Check the validity of a provided message handler,
-# dying if not valid.
-sub is_message {
-	my $it = $_[1];
+=pod
 
-	# The callback is an anonymous subroutine
-	return $it if Params::Util::_CODE($it);
+=head2 _alias_set
 
-	# Otherwise, we also allow a reference to an array,
-	# which contains two identifiers (like foo_bar).
-	# This will be converted to a call to the relevant
-	# POE session.event
-	if (
-		Params::Util::_ARRAY0($it)
-		and
-		scalar(@$it) == 2
-		and
-		Params::Util::_IDENTIFIER($it->[0])
-		and
-		Params::Util::_IDENTIFIER($it->[1])
-	) {
-		# Create a closure for the call
-		my $session = $it->[0];
-		my $event   = $it->[1];
-		my $closure = sub {
-			$poe_kernel->call( $session, $event, @_ );
-		};
-		return $closure;
+During the period in which a L<POE::Declare> object is active, it will
+register an alias with the L<POE> kernel (so that the session will not be
+cleaned up if it has no queued events of it's own and it only waiting for
+other sessions to send it a message).
+
+The C<_alias_set> method (which takes no parameters) will set the alias
+for the current object. This will be done automatically for you during
+the C<spawn> process (in the C<_start> event).
+
+=cut
+
+sub _alias_set : Event {
+	### This will fail is sessions have clashing aliases
+	my $alias = $_[HEAP]->Alias;
+	unless ( defined $poe_kernel->alias_resolve($alias) ) {
+		if ( $poe_kernel->alias_set($alias) ) {
+			# Failed to set alias
+			Carp::croak("Failed to set alias '$alias'");
+		}
 	}
+}
 
-	# Otherwise, not valid
-	Carp::croak('Invalid callback event handler');
+=pod
+
+=head2 _alias_remove
+
+Each L<POE::Declare> object has a POE session and a unique alias, which is
+registered with the POE core when it is spawned.
+
+Even if no events, timers, callbacks or handles are registered for the
+session, the existance of the alias will keep the session alive.
+
+The C<_alias_remove> event is used to trigger the stopping of the session
+as soon as all currently live events have been cleared.
+
+This method is usually called at the beginning of a shutdown process, to
+indicate that the session is no longer permanent and should shutdown when
+possible.
+
+=cut
+
+sub _alias_remove : Event {
+	my $self    = $_[HEAP];
+	my $alias   = $self->Alias;
+	my $session = $poe_kernel->alias_resolve($alias);
+	my $poe_id  = $session->ID;
+	my $self_id = $ID{Scalar::Util::refaddr($self)};
+	unless ( defined $poe_id and defined $self_id ) {
+		return;
+	}
+	unless ( $poe_id == $self_id ) {
+		Carp::croak("Session id mismatch error");
+	}
+	$poe_kernel->alias_remove($alias);
 }
 
 
