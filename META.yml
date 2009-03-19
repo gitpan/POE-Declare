@@ -8,7 +8,7 @@ build_requires:
   Test::NoWarnings: 0.084
   Test::POE::Stopping: 0.02
 distribution_type: module
-generated_by: 'Module::Install version 0.79'
+generated_by: 'Module::Install version 0.80'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,4 +31,4 @@ requires:
   perl: 5.8.7
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.19
+version: 0.21

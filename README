@@ -3,26 +3,26 @@ NAME
 
 SYNOPSIS
       package MyComponent;
-  
-      use strict;
+      
+  use strict;
       use POE::Declare;
-  
-      declare foo          => 'Attribute';
+      
+  declare foo          => 'Attribute';
       declare bar          => 'Internal';
       declare TimeoutError => 'Message';
-  
-      sub hello : Event {
+      
+  sub hello : Event {
           print "Hello World!\n";
       }
-  
-      sub hello_timeout : Timeout(30) {
+      
+  sub hello_timeout : Timeout(30) {
           print "Alas, I die!\n";
-  
-          # Tell our parent as well
+      
+      # Tell our parent as well
           $_[SELF]->TimeoutError;
       }
-  
-      1;
+      
+  1;
 
 DESCRIPTION
     WARNING: THIS CODE IS EXPERIMENTAL AND SUBJECT TO CHANGE WITHOUT NOTICE
