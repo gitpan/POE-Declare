@@ -31,9 +31,11 @@ use Class::Inspector ();
 
 use vars qw{$VERSION $DEBUG};
 BEGIN {
-	$VERSION = '0.21';
+	$VERSION = '0.22';
 	$DEBUG   = !! $DEBUG;
 }
+
+use constant DEBUG => $DEBUG;
 
 use POE::Declare::Meta::Slot      ();
 use POE::Declare::Meta::Message   ();
@@ -42,8 +44,6 @@ use POE::Declare::Meta::Timeout   ();
 use POE::Declare::Meta::Attribute ();
 use POE::Declare::Meta::Internal  ();
 use POE::Declare::Meta::Param     ();
-
-use constant DEBUG => $DEBUG;
 
 use Class::XSAccessor
 	getters => {
@@ -222,7 +222,6 @@ sub attrs {
 
 
 
-
 #####################################################################
 # Compilation
 
@@ -256,7 +255,7 @@ sub _compile {
 	}
 
 	# Get all the package fragments
-	my $code  = join "\n", (
+	my $code = join "\n", (
 		"package " . $self->name . ";",
 		"sub meta () { \$POE::Declare::META{'$name'} }",
 		map {

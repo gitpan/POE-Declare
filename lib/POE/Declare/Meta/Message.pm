@@ -36,14 +36,14 @@ use POE::Declare::Meta::Param ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '0.21';
+	$VERSION = '0.22';
 	@ISA     = 'POE::Declare::Meta::Param';
 }
 
 sub _compile { <<"END_PERL" }
 sub $_[0]->{name} {
 	\$_[0]->{$_[0]->{name}} or return '';
-	\$_[0]->{$_[0]->{name}}->( \$_[0]->{Alias}, \@_ );
+	\$_[0]->{$_[0]->{name}}->( \$_[0]->{Alias}, \@_[1..\$#_] );
 	return 1;
 }
 END_PERL
