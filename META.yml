@@ -7,11 +7,11 @@ build_requires:
   Test::Exception: 0.27
   Test::More: 0.80
   Test::NoWarnings: 0.084
-  Test::POE::Stopping: 0.03
+  Test::POE::Stopping: 1.05
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 0.91'
+generated_by: 'Module::Install version 0.97'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,10 +22,11 @@ no_index:
   directory:
     - inc
     - t
+    - xt
 requires:
   Class::ISA: 0.33
   Class::Inspector: 1.22
-  Class::XSAccessor: 0.14
+  Class::XSAccessor: 1.05
   IO::File: 1.14
   List::Util: 1.19
   POE: 1.003
@@ -36,4 +37,4 @@ resources:
   ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/POE-Declare
   license: http://dev.perl.org/licenses/
   repository: http://svn.ali.as/cpan/trunk/POE-Declare
-version: 0.23_01
+version: 0.25

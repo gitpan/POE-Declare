@@ -2,6 +2,7 @@ Changes
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
+inc/Module/Install/DSL.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
@@ -30,6 +31,6 @@ t/04_stop.t
 t/05_timeout.t
 t/06_message.t
 t/07_nested.t
-t/97_meta.t
-t/98_pod.t
-t/99_pmv.t
+xt/meta.t
+xt/pmv.t
+xt/pod.t

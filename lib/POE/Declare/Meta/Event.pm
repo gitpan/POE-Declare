@@ -24,11 +24,11 @@ POE::Declare::Meta::Event - Declares a named POE event
 
 Taking advantage of the subroutine attribute feature of recent versions
 of Perl, the C<Event> attribute is used to register a function/method as
-an event that can be targetted by POE events.
+an named event that can be targetted by POE.
 
-In an Event, the non-core parameter constant SELF is used to retrieve
-the current object (Since all objects are stored in the session heap,
-SELF is actually just an alias for HEAP).
+In an Event, the non-default array constant SELF is used to retrieve
+the current object (Since each objects are stored in the session heap,
+SELF is actually just an alias for HEAP, but adds some clarity).
 
 =cut
 
@@ -39,7 +39,7 @@ use POE::Declare::Meta::Slot ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '0.23_01';
+	$VERSION = '0.25';
 	@ISA     = 'POE::Declare::Meta::Slot';
 }
 
@@ -65,7 +65,7 @@ L<POE>, L<POE::Declare>
 
 =head1 COPYRIGHT
 
-Copyright 2006 - 2009 Adam Kennedy.
+Copyright 2006 - 2010 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
