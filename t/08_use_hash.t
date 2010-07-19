@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Compile testing for POE::Declare
+# This is a copy of 03_simple.t but with compile time attribute declaration
 
 use strict;
 use warnings;
@@ -23,19 +23,19 @@ use Test::Exception;
 SCOPE: {
 	package Foo;
 
-	use POE::Declare;
 	use POE qw{ Session };
+	use POE::Declare {
+		bar => 'Internal',
+		foo => 'Attribute',
+		One => 'Param',
+		Two => 'Param',
+	};
 
 	# Shut up a warning
 	POE::Kernel->run;
 
 	# Check that SELF is exported, and matches HEAP
 	main::is( SELF, HEAP, 'SELF == HEAP' );
-
-	declare bar => 'Internal';
-	declare foo => 'Attribute';
-	declare One => 'Param';
-	declare Two => 'Param';
 
 	sub findme : Event {
 		my $self = $_[SELF];
@@ -191,10 +191,10 @@ SCOPE: {
 		@ISA = 'Foo';
 	}
 
-	use POE::Declare;
-
-	declare baz     => 'Attribute';
-	declare MyParam => 'Param';
+	use POE::Declare {
+		baz     => 'Attribute',
+		MyParam => 'Param',
+	};
 
 	compile;
 }

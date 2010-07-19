@@ -5,13 +5,14 @@ SYNOPSIS
       package MyComponent;
       
   use strict;
-      use POE::Declare;
+      use POE::Declare {
+            foo      => 'Attribute',
+            bar      => 'Internal',
+            Username => 'Param',
+            Password => 'Param',
+      };
       
-  declare foo          => 'Attribute';
-      declare bar          => 'Internal';
-      declare Username     => 'Param';
-      declare Password     => 'Param';
-      declare TimeoutError => 'Message';
+  declare TimeoutError => 'Message';
       
   sub hello : Event {
           print "Hello World!\n";
@@ -94,6 +95,23 @@ DESCRIPTION
     Once the class has been compiled, the installed functions will be
     removed from the package to prevent run-time namespace pollution.
 
+  Import-Time Declaration
+    The cluster of "declare" statements at the beginning of a POE::Declare
+    class can look ugly to some people, and may get annoying to step through
+    in the debugger.
+
+    To resolve this, you may optionally provide a list of slot declarations
+    to the module at compile time. This should be in the form of a simple
+    "HASH" reference with the names as keys and the type as values.
+
+      use My::Module {
+          Foo => 'Param',
+          Bar => 'Param',
+      };
+
+    Event and timeout declarations cannot be provided by this method, and
+    you should continue to use subroutine attributes for these as normal.
+
   Inheritance
     The resource model of POE::Declare correctly follows inheritance,
     similar to the way declarations in Moose are inherited. Resource types
@@ -119,7 +137,7 @@ DESCRIPTION
       
   compile;
       
-  $ Child.pm - Connect to an (optionally) authenticating service
+  # Child.pm - Connect to an (optionally) authenticating service
       package Child;
       
   use strict;
