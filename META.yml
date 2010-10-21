@@ -29,7 +29,7 @@ requires:
   Class::XSAccessor: 1.05
   IO::File: 1.14
   List::Util: 1.19
-  POE: 1.003
+  POE: 1.293
   Params::Util: 1.00
   Scalar::Util: 1.19
   perl: 5.8.7
@@ -37,4 +37,4 @@ resources:
   ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/POE-Declare
   license: http://dev.perl.org/licenses/
   repository: http://svn.ali.as/cpan/trunk/POE-Declare
-version: 0.26
+version: 0.50
