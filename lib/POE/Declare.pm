@@ -259,7 +259,7 @@ use constant SELF => HEAP;
 
 use vars qw{$VERSION @ISA @EXPORT %ATTR %EVENT %META};
 BEGIN {
-	$VERSION = '0.50';
+	$VERSION = '0.51';
 	@ISA     = qw{ Exporter };
 	@EXPORT  = qw{ SELF declare compile };
 
@@ -449,8 +449,8 @@ sub compile () {
 		$meta->{attr}->{$name} = $ATTR{$pkg}->{$name};
 	}
 
-	# Compile the individual parts
-	$meta->_compile;
+	# Attempt to compile all the individual parts
+	$meta->as_perl;
 }
 
 # Get the meta-object for a class.
@@ -489,7 +489,7 @@ L<POE>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 
-Copyright 2006 - 2010 Adam Kennedy.
+Copyright 2006 - 2011 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

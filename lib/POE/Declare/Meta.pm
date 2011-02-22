@@ -31,7 +31,7 @@ use Class::Inspector ();
 
 use vars qw{$VERSION $DEBUG};
 BEGIN {
-	$VERSION = '0.50';
+	$VERSION = '0.51';
 	$DEBUG   = !! $DEBUG;
 }
 
@@ -226,7 +226,7 @@ sub attrs {
 #####################################################################
 # Compilation
 
-sub _compile {
+sub as_perl {
 	my $self = shift;
 	my $name = $self->name;
 	my $attr = $self->{attr};
@@ -260,7 +260,7 @@ sub _compile {
 		"package " . $self->name . ";",
 		"sub meta () { \$POE::Declare::META{'$name'} }",
 		map {
-			$attr->{$_}->_compile
+			$attr->{$_}->as_perl
 		} sort keys %$attr
 	);
 
@@ -407,7 +407,7 @@ L<POE>
 
 =head1 COPYRIGHT
 
-Copyright 2006 - 2010 Adam Kennedy.
+Copyright 2006 - 2011 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

@@ -31,7 +31,7 @@ use POE::Declare ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.50';
+	$VERSION = '0.51';
 }
 
 # Inside-out storage of internal values
@@ -744,7 +744,7 @@ L<POE>, L<POE::Declare>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 
-Copyright 2006 - 2010 Adam Kennedy.
+Copyright 2006 - 2011 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

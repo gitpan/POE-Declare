@@ -46,7 +46,7 @@ use warnings;
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.50';
+	$VERSION = '0.51';
 }
 
 use Class::XSAccessor {
@@ -57,7 +57,7 @@ use Class::XSAccessor {
 };
 
 # By default, a slot contains nothing
-sub _compile { '' }
+sub as_perl { '' }
 
 1;
 
@@ -81,7 +81,7 @@ L<POE>, L<POE::Declare>
 
 =head1 COPYRIGHT
 
-Copyright 2006 - 2010 Adam Kennedy.
+Copyright 2006 - 2011 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
