@@ -27,7 +27,6 @@ requires:
   Class::ISA: 0.33
   Class::Inspector: 1.22
   Class::XSAccessor: 1.05
-  IO::File: 1.14
   List::Util: 1.19
   POE: 1.293
   Params::Util: 1.00
@@ -37,4 +36,4 @@ resources:
   ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/POE-Declare
   license: http://dev.perl.org/licenses/
   repository: http://svn.ali.as/cpan/trunk/POE-Declare
-version: 0.51
+version: 0.52
