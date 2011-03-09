@@ -31,7 +31,7 @@ use Class::Inspector 1.22 ();
 
 use vars qw{$VERSION $DEBUG};
 BEGIN {
-	$VERSION = '0.52';
+	$VERSION = '0.53';
 	$DEBUG   = !! $DEBUG;
 }
 
@@ -45,7 +45,7 @@ use POE::Declare::Meta::Attribute ();
 use POE::Declare::Meta::Internal  ();
 use POE::Declare::Meta::Param     ();
 
-use Class::XSAccessor 1.05 {
+use Class::XSAccessor 1.10 {
 	getters => {
 		name     => 'name',
 		alias    => 'alias',
