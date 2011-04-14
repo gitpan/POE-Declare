@@ -6,10 +6,10 @@ SYNOPSIS
       
   use strict;
       use POE::Declare {
-            foo      => 'Attribute',
-            bar      => 'Internal',
-            Username => 'Param',
-            Password => 'Param',
+          foo      => 'Attribute',
+          bar      => 'Internal',
+          Username => 'Param',
+          Password => 'Param',
       };
       
   declare TimeoutError => 'Message';
