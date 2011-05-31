@@ -7,7 +7,7 @@ build_requires:
   Test::Exception: 0.27
   Test::More: 0.80
   Test::NoWarnings: 0.084
-  Test::POE::Stopping: 1.08
+  Test::POE::Stopping: 1.09
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
@@ -28,7 +28,7 @@ requires:
   Class::Inspector: 1.22
   Class::XSAccessor: 1.10
   List::Util: 1.19
-  POE: 1.293
+  POE: 1.310
   Params::Util: 1.00
   Scalar::Util: 1.19
   perl: 5.8.7
@@ -36,4 +36,4 @@ resources:
   ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/POE-Declare
   license: http://dev.perl.org/licenses/
   repository: http://svn.ali.as/cpan/trunk/POE-Declare
-version: 0.55
+version: 0.56
