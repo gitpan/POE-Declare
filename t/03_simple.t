@@ -9,7 +9,7 @@ BEGIN {
 	# $POE::Declare::Meta::DEBUG = 1;
 }
 
-use Test::More tests => 59;
+use Test::More tests => 61;
 use Test::NoWarnings;
 use Test::Exception;
 
@@ -106,7 +106,7 @@ SCOPE: {
 	isa_ok( $meta->{attr}->{to},     'POE::Declare::Meta::Timeout'   );
 	is( $meta->{attr}->{foo}->name,    'foo',    'Attribute foo ->name ok'    );
 	is( $meta->{attr}->{bar}->name,    'bar',    'Attribute bar ->name ok'    );
-        is( $meta->{attr}->{findme}->name, 'findme', 'Attribute findme ->name ok' );
+	is( $meta->{attr}->{findme}->name, 'findme', 'Attribute findme ->name ok' );
 	is( $meta->{attr}->{to}->name,     'to',     'Attribute to ->name ok'     );
 
 	# Create an object
@@ -114,6 +114,16 @@ SCOPE: {
 	isa_ok( $object, 'Foo' );
 	is( $object->One,   'foo',   '->foo created and returns correctly' );
 	is( $object->Alias, 'Foo.1', 'Pregenerated ->Alias returns as expected' );
+
+	# Calling finish on an unspawned object should be harmless
+	ok( ! $object->spawned, '->spawned is false for new object' );
+	throws_ok(
+		sub {
+			$object->finish;
+		},
+		qr/Called 'finish' for Foo.1 on unspawned/,
+		'->finish on unspawned object throws expected exception',
+	);
 
 	# Test errors
 	throws_ok(
