@@ -121,7 +121,7 @@ DESCRIPTION
     directly on top of Perl's native inheritance.
 
       # Parent.pm - Object that connects to a service
-      package Parent;
+      package My::Parent;
       
   use strict;
       use POE::Declare {
@@ -138,10 +138,10 @@ DESCRIPTION
   compile;
       
   # Child.pm - Connect to an (optionally) authenticating service
-      package Child;
+      package My::Child;
       
   use strict;
-      use base 'Parent';
+      use base 'My::Parent';
       use POE::Declare {
           Username     => 'Param',
           Password     => 'Param',
@@ -250,7 +250,7 @@ SEE ALSO
     POE, <http://ali.as/>
 
 COPYRIGHT
-    Copyright 2006 - 2011 Adam Kennedy.
+    Copyright 2006 - 2012 Adam Kennedy.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
